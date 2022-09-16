@@ -1,6 +1,11 @@
 import app from '../src/app';
 import supertest from 'supertest';
 import { generateItem, createItem } from './factories/itemFactory';
+import { prisma } from '../src/database';
+
+beforeEach(async () => {
+	await prisma.$executeRaw`TRUNCATE TABLE items`
+})
 
 describe('Testa POST /items ', () => {
 	it('Deve retornar 201, se cadastrado um item no formato correto', async () => {
@@ -12,7 +17,7 @@ describe('Testa POST /items ', () => {
 	});
 
 	it('Deve retornar 409, ao tentar cadastrar um item que exista', async () => {
-		const {item: body} = await createItem();
+		const { item: body } = await createItem();
 
 		const result = await supertest(app).post("/items").send(body);
 
